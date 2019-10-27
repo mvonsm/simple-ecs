@@ -3,15 +3,13 @@ from enum import Enum
 
 
 class Storage(Enum):
-    """Storage enum to identify how component should be stored."""
-
     DEFAULT = 1
     PACKED = 2
     DUPLICATE = 3
 
 
 class Component:
-    """Component is a property of an entity."""
+    '''A generic component. '''
 
     storage = Storage.DEFAULT
 
@@ -20,15 +18,11 @@ class Component:
 
 
 class Entity:
-    """Entity represents an object in the store."""
-
     def __init__(self):
         self.component_types = set()
 
 
 class Store:
-    """Storage for entities, components, and the connections between them."""
-
     def __init__(self):
         self.components = {}
         self.entities = []
@@ -60,7 +54,7 @@ class Store:
         if component_type.storage == Storage.DEFAULT:
             pass
 
-    def _get_ent_components(self, ent, component_types):
+    def _get_ent_components(self, ent, *component_types):
 
         result = []
         for ctype in component_types:
@@ -81,12 +75,12 @@ class Store:
     def _handle_callback(self, callback):
 
         for ent in self.entities:
-            if not set(callback.args).issubset(ent.component_types):
+            if not callback.component_types.issubset(ent.component_types):
                 continue
 
-            result = self._get_ent_components(ent, callback.args)
+            result = self._get_ent_components(ent, *callback.component_types)
 
-            callback.callback(*result)
+            callback.callback(result)
 
     def update(self):
         for callback in self.callbacks:
@@ -95,16 +89,12 @@ class Store:
 
 #  Can likely be consolidated into one class
 class ComponentCallback:
-    """ComponentCallback is a wrapper for functions set to be called when store updates."""
-
-    def __init__(self, callback: Callable, ctypes):
+    def __init__(self, callback: Callable, *args):
         self.callback = callback
-        self.args = ctypes
+        self.component_types = set(*args)
 
 
 class ComponentSystem:
-    """ComponentSystem decorates a function to act on entity properties."""
-
     def __init__(self, store: Store, *args):
         self.store = store
         self.component_types = args
