@@ -16,7 +16,12 @@ class MoveComponent(Component):
         self.z = z
 
 
-def test_increment(store: Store):
+class MassComponent(Component):
+    def __init__(self, mass):
+        self.mass = mass
+
+
+def test_basic(store: Store):
     @ComponentSystem(store, MoveComponent)
     def handleinput(result):
 
@@ -25,4 +30,15 @@ def test_increment(store: Store):
 
     ent = store.create_entity()
     store.assign(ent, MoveComponent(0, 0, 0))
+    store.update()
+
+
+def test_multiple(store: Store):
+    @ComponentSystem(store, MoveComponent, MassComponent)
+    def handleinput(position, mass):
+        print(f"position {position} mass {mass}")
+
+    ent = store.create_entity()
+    store.assign(ent, MoveComponent(0, 0, 0))
+    store.assign(ent, MassComponent(100))
     store.update()
