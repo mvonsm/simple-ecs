@@ -1,1 +1,2 @@
-from .ecs import Store, Component, ComponentSystem, Storage
+from .ecs import Store, Component, ComponentSystem
+from .storage import DictStorage, PackedStorage

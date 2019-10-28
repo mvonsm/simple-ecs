@@ -1,5 +1,5 @@
 import pytest
-from simple_ecs import Store, Component, ComponentSystem, Storage
+from simple_ecs import Store, Component, ComponentSystem, DictStorage
 
 
 @pytest.fixture
@@ -8,7 +8,7 @@ def store():
 
 
 class MoveComponent(Component):
-    storage = Storage.DEFAULT
+    storage = DictStorage
 
     def __init__(self, x, y, z):
         self.x = x
