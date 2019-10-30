@@ -1,13 +1,19 @@
 class Storage:
-    """Storage determines technique to store components,"""
+    """Storage determines technique to store components."""
 
     def __init__(self):
         pass
 
     def insert(self, entity, component):
+        """Store a specific entity's component."""
         raise NotImplementedError
 
-    def get(entity):
+    def get(self, entity):
+        """Get an entity's component from storage."""
+        raise NotImplementedError
+
+    def delete(self, entity):
+        """Delete an entity's component from storage."""
         raise NotImplementedError
 
 
@@ -33,13 +39,13 @@ class PackedStorage(Storage):
         super().__init__(*args, **kwargs)
         self.components = []
 
+    def get(self, entity):
+        for _entity, component in self.components:
+            if _entity == entity:
+                return component
+
+        raise IndexError
+
     def insert(self, key, value):
         # Entities should not have multiple of same component
         self.components.append((key, value))
-
-        def get(entity):
-            for _entity, component in self.components:
-                if _entity == entity:
-                    return component
-
-            raise IndexError

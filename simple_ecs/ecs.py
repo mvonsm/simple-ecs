@@ -1,13 +1,12 @@
-from typing import Callable
-from enum import Enum
+from typing import Callable, Type, List, Tuple
 
-from .storage import DictStorage, PackedStorage
+from .storage import Storage, DictStorage, PackedStorage
 
 
 class Component:
     """Component is a property of an entity."""
 
-    storage = DictStorage
+    storage: Type[Storage] = DictStorage
 
     def __init__(self):
         raise NotImplementedError
@@ -28,12 +27,19 @@ class Store:
         self.entities = []
         self.callbacks = []
 
-    def create_entity(self):
+    def create_entity(self) -> Entity:
+        """Creates and registers new entity in the store."""
         entity = Entity()
         self.entities.append(entity)
         return entity
 
     def assign(self, entity: Entity, component: Component):
+        """Assign a component to an entity.
+        
+        :param entity: The :class:`Entity <Entity>` to assign the :class:`Component <Component>` to.
+        :param component: The component to assign.
+
+        """
 
         entity.component_types.add(component.__class__)
         storage = self.components.setdefault(
@@ -41,27 +47,40 @@ class Store:
         )
         storage.insert(entity, component)
 
-    def get_components(self):
-        raise NotImplementedError
+    def _get_ent_components(
+        self, entity: Entity, component_types: Tuple[Type[Component]]
+    ) -> List[Component]:
 
-    def _get_ent_components(self, ent, component_types):
+        """Returns the components of an entity.
+
+        :param entity: The :class:`Entity <Entity>` to get components of.
+        :param component_types: Tuple of Component derived types.
+        """
 
         result = []
         for ctype in component_types:
-            result.append(self.components[ctype].get(ent))
+            result.append(self.components[ctype].get(entity))
 
         return result
 
-    def _handle_callback(self, callback):
+    def _handle_callback(
+        self, callback: Callable, component_types: Tuple[Type[Component]]
+    ):
+        """Prepares callback arguments, then calls with those arguments.
+        :param callback: The system to call.
+        :param component_types: Tuple of Component derived types.
+
+        """
 
         for ent in self.entities:
-            if set(callback.args).issubset(ent.component_types):
-                result = self._get_ent_components(ent, callback.args)
-                callback.callback(*result)
+            if set(component_types).issubset(ent.component_types):
+                result = self._get_ent_components(ent, component_types)
+                callback(*result)
 
     def update(self):
-        for callback in self.callbacks:
-            self._handle_callback(callback)
+        """Call all registered update functions."""
+        for callback, component_types in self.callbacks:
+            self._handle_callback(callback, component_types)
 
 
 class ComponentSystem:
@@ -71,7 +90,7 @@ class ComponentSystem:
         self.store = store
         self.args = args
 
-    def __call__(self, callback):
+    def __call__(self, callback: Callable):
         self.callback = callback
-        self.store.callbacks.append(self)
+        self.store.callbacks.append((self.callback, self.args))
         return callback
