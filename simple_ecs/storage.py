@@ -1,18 +1,15 @@
 class Storage:
     """Storage determines technique to store components."""
 
-    def __init__(self):
-        pass
-
-    def insert(self, entity, component):
+    def insert(self, entity: 'Entity', component: 'Component'):
         """Store a specific entity's component."""
         raise NotImplementedError
 
-    def get(self, entity):
+    def get(self, entity: 'Entity') -> 'Component':
         """Get an entity's component from storage."""
         raise NotImplementedError
 
-    def delete(self, entity):
+    def delete(self, entity: 'Entity'):
         """Delete an entity's component from storage."""
         raise NotImplementedError
 
@@ -22,7 +19,6 @@ class DictStorage(Storage):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
         self.components = {}
 
     def get(self, key):
