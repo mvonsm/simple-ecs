@@ -36,6 +36,9 @@ def test_basic(store: Store):
 def test_multiple(store: Store):
     @ComponentSystem(store, MoveComponent, MassComponent)
     def handleinput(position, mass):
+        assert position.__class__ == MoveComponent
+        assert mass.__class__ == MassComponent
+
         print(f"position {position} mass {mass}")
 
     ent = store.create_entity()

@@ -1,5 +1,4 @@
 from typing import Callable, Type, List, Tuple
-
 from .storage import Storage, DictStorage, PackedStorage
 
 
@@ -38,7 +37,6 @@ class Store:
         
         :param entity: The :class:`Entity <Entity>` to assign the :class:`Component <Component>` to.
         :param component: The component to assign.
-
         """
 
         entity.component_types.add(component.__class__)
@@ -69,7 +67,6 @@ class Store:
         """Prepares callback arguments, then calls with those arguments.
         :param callback: The system to call.
         :param component_types: Tuple of Component derived types.
-
         """
 
         for ent in self.entities:
